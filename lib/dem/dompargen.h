@@ -573,12 +573,16 @@ inline void Domain::AddSphere (int Tag,Vec3_t const & X, double R, double rho)
     // add particle
     Particles.Push (new Particle(Tag,V,E,F,OrthoSys::O,OrthoSys::O,R,rho));
 
+    //double    Angle = (1.0*rand())/RAND_MAX*2*M_PI;
+    //Vec3_t    Axis  = Vec3_t((1.0*rand())/RAND_MAX, (1.0*rand())/RAND_MAX, (1.0*rand())/RAND_MAX);
+
     Quaternion_t q;
     q(0) = 1.0;
     q(1) = 0.0;
     q(2) = 0.0;
     q(3) = 0.0;
     q = q/norm(q);
+    //NormalizeRotation (Angle,Axis,q);
 
     Particles[Particles.Size()-1]->Q          = q;
     Particles[Particles.Size()-1]->Props.V    = (4.0/3.0)*M_PI*R*R*R;

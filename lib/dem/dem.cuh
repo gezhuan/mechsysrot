@@ -54,7 +54,7 @@ struct dem_aux
 
 };
 
-__global__ void CalcForceVV(InteractonCU const * Int, ComInteractonCU * CInt, DynInteractonCU * DIntVV, ParticleCU * Par, DynParticleCU * DPar, dem_aux const * demaux)
+__global__ void CalcForceVV(InteractonCU * Int, ComInteractonCU * CInt, DynInteractonCU * DIntVV, ParticleCU * Par, DynParticleCU * DPar, dem_aux const * demaux)
 {
     size_t ic = threadIdx.x + blockIdx.x * blockDim.x;
     if (ic>=demaux[0].nvvint) return;
@@ -114,9 +114,32 @@ __global__ void CalcForceVV(InteractonCU const * Int, ComInteractonCU * CInt, Dy
         
         DIntVV[ic].F = DIntVV[ic].Fn + DIntVV[ic].Ft + Int[id].Gn*dotreal3(n,vrel)*n + Int[id].Gt*vt;
 #else
-        real sqrtdelta = sqrt(delta);
-        DIntVV[ic].Fn  = Int[id].Kn*sqrtdelta*delta*n;
-        DIntVV[ic].Ft  = DIntVV[ic].Ft + (Int[id].Kt*sqrtdelta*demaux[0].dt)*vt;
+        real3 zu = make_real3(0.0,0.0,1.0); // zpi will be the z vector of particle i
+        real3 zp1,zp2;
+        Rotation(zu,DPar[i1].Q,zp1);
+        Rotation(zu,DPar[i2].Q,zp2); 
+        real  a1  = acos(dotreal3(zp1,-1.0*n)); // ai wil121l be the angle with the z vector of particle i
+        real  a2  = acos(dotreal3(zp2,     n));
+        real  fac = 1.0e-6;                 // fac is the reduction factor for the stiffness
+        real  K1  = Par[i1].Kn*(fac + (1.0 - fac)*0.5*(1.0-tanh((a1-1.5708)/0.001))); //The stiffness is related to the angle between the normal
+                                                                                      //vector and the z vector
+        real  K2  = Par[i2].Kn*(fac + (1.0 - fac)*0.5*(1.0-tanh((a2-1.5708)/0.001)));
+        real  Re  = r1*r2/(r1+r2);
+        real  me  = Par[i1].m*Par[i2].m/(Par[i1].m+Par[i2].m);
+        real  nu1 = 0.5*Par[i1].Kn/Par[i1].Kt - 1.0;
+        real  nu2 = 0.5*Par[i2].Kn/Par[i2].Kt - 1.0;
+        real  Ye  = 1.0/((1.0-nu1*nu1)/K1 + (1.0-nu2*nu2)/K2);
+        real  Ge  = 1.0/(2.0*(2.0-nu1)*(1.0+nu1)/K1 + 2.0*(2.0-nu2)*(1.0+nu2)/K2);
+        real  Kn  = 4.0/3.0*sqrt(Re)*Ye;
+        real  Kt  = 8.0*sqrt(Re)*Ge;
+        real  e   = 2.0*Par[i1].e*Par[i2].e/(Par[i1].e+Par[i2].e);
+        real  b   = sqrt(pow(log(e),2.0)/(M_PI*M_PI+pow(log(e),2.0)));
+        real  Gn  = 2.0*sqrt(5.0/6.0)*b*sqrt(me*2.0*Ye*sqrt(Re));
+        real  Gt  = 2.0*sqrt(5.0/6.0)*b*sqrt(me*8.0*Ge*sqrt(Re));
+        real  sqrtdelta = sqrt(delta);
+
+        DIntVV[ic].Fn  = Kn*sqrtdelta*delta*n;
+        DIntVV[ic].Ft  = DIntVV[ic].Ft + (Kt*sqrtdelta*demaux[0].dt)*vt;
         DIntVV[ic].Ft  = DIntVV[ic].Ft - dotreal3(DIntVV[ic].Ft,n)*n;
 
         real3 tan = DIntVV[ic].Ft;
@@ -127,7 +150,7 @@ __global__ void CalcForceVV(InteractonCU const * Int, ComInteractonCU * CInt, Dy
         }
 
         real3 vr = r1*r2*cross((t1 - t2),n)/(r1+r2);
-        DIntVV[ic].Fr  = DIntVV[ic].Fr + (Int[id].Beta*Int[id].Kt*sqrtdelta*demaux[0].dt)*vr;
+        DIntVV[ic].Fr  = DIntVV[ic].Fr + (Int[id].Beta*Kt*sqrtdelta*demaux[0].dt)*vr;
         DIntVV[ic].Fr  = DIntVV[ic].Fr - dotreal3(DIntVV[ic].Fr,n)*n;
 
         tan = DIntVV[ic].Fr;
@@ -137,7 +160,7 @@ __global__ void CalcForceVV(InteractonCU const * Int, ComInteractonCU * CInt, Dy
             DIntVV[ic].Fr = Int[id].Eta*Int[id].Mu*norm(DIntVV[ic].Fn)*tan;
         }
         
-        DIntVV[ic].F = DIntVV[ic].Fn + DIntVV[ic].Ft + Int[id].Gn*sqrt(sqrtdelta)*dotreal3(n,vrel)*n + Int[id].Gt*sqrt(sqrtdelta)*vt;
+        DIntVV[ic].F = DIntVV[ic].Fn + DIntVV[ic].Ft + Gn*sqrt(sqrtdelta)*dotreal3(n,vrel)*n + Gt*sqrt(sqrtdelta)*vt;
 #endif
 
         real3 T1,T2,T, Tt;

@@ -33,7 +33,7 @@ OPTION(A_MAKE_USE_GPU_DOUBLE "Use double precision numbers in GPU computation"  
 OPTION(A_MAKE_IGNORE_SOLID   "Ignore deep solid cells from LBM computations"                                OFF)
 OPTION(A_MAKE_USE_IBB        "Use Immersed Bounce Back instead of Gamma Method for DEM-LBM simulations"     OFF)
 OPTION(A_MAKE_USE_LADD       "Use Ladd instead of Gamma Method for DEM-LBM simulations"                     OFF)
-OPTION(A_MAKE_USE_HERTZ      "Use Hertz law instead of linear dashpot for DEM simulations"                  OFF)
+OPTION(A_MAKE_USE_HERTZ      "Use Hertz law instead of linear dashpot for DEM simulations"                  ON )
                                                                                    
 # Options                                                                          
 OPTION(A_USE_OMP            "Use OpenMP  ?"                                        ON )

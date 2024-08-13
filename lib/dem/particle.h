@@ -1196,9 +1196,12 @@ struct ParticleCU
     bool           wxf, wyf, wzf;                                   ///< Fixed components of angular velocity
     bool           FixFree;                                         ///< Fixed to be free, even if there are some constrains 
     bool           Closed;                                          ///< Flag to say if the polyhedra is closed or not
-    real           R;                                               ///< Spheroradious of particle
+    real           R;                                               ///< Spheroradius of particle
     real           m;                                               ///< Mass of particle
     real           Dmax;                                            ///< Maximun Diameter
+    real           Kn;                                              ///< Particle normal     stiffness
+    real           Kt;                                              ///< Particle tangential stiffness
+    real           e;                                               ///< Particle restitution coefficient
     real3          Ff;                                              ///< Fixed Force over the particle
     real3          Flbmf;                                           ///< Fixed Force over the particle by lbm fluid
     real3          T;                                               ///< Torque over the particle
@@ -1242,6 +1245,9 @@ __host__ void UploadParticle(DEM::DynParticleCU & DPc, DEM::ParticleCU & Pcu,DEM
     Pcu.R               = Par.Props.R;
     Pcu.m               = Par.Props.m;
     Pcu.Dmax            = Par.Dmax;
+    Pcu.Kn              = Par.Props.Kn;
+    Pcu.Kt              = Par.Props.Kt;
+    Pcu.e               =-Par.Props.Gn;
     Pcu.Ff.x            = Par.Ff(0);
     Pcu.Ff.y            = Par.Ff(1);
     Pcu.Ff.z            = Par.Ff(2);
