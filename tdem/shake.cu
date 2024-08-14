@@ -155,6 +155,11 @@ int main(int argc, char **argv) try
     NormalizeRotation (angle,axis,q);
     d2.GetParticle(-1)->Q = q;
     d2.GetParticle(-4)->Q = q;
+
+    d2.GetParticle(-1)->Props.fac = 1.0e-4;
+    d2.GetParticle(-2)->Props.fac = 1.0e-4;
+    d2.GetParticle(-3)->Props.fac = 1.0e-4;
+    d2.GetParticle(-4)->Props.fac = 1.0;
     
 
     for (size_t np=0;np<d2.Particles.Size();np++)

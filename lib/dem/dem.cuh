@@ -121,9 +121,9 @@ __global__ void CalcForceVV(InteractonCU * Int, ComInteractonCU * CInt, DynInter
         real  a1  = acos(dotreal3(zp1,-1.0*n)); // ai will be the angle with the z vector of particle i
         real  a2  = acos(dotreal3(zp2,     n));
         real  fac = 1.0e-6;                 // fac is the reduction factor for the stiffness
-        real  K1  = Par[i1].Kn*(fac + (1.0 - fac)*0.5*(1.0-tanh((a1-1.5708)/0.001))); //The stiffness is related to the angle between the normal
+        real  K1  = Par[i1].Kn*(Par[i1].fac + (1.0 - Par[i1].fac)*0.5*(1.0-tanh((a1-1.5708)/Par[i1].dac))); //The stiffness is related to the angle between the normal
                                                                                       //vector and the z vector
-        real  K2  = Par[i2].Kn*(fac + (1.0 - fac)*0.5*(1.0-tanh((a2-1.5708)/0.001)));
+        real  K2  = Par[i2].Kn*(Par[i2].fac + (1.0 - Par[i2].fac)*0.5*(1.0-tanh((a2-1.5708)/Par[i2].dac)));
         real  Re  = r1*r2/(r1+r2);
         real  me  = Par[i1].m*Par[i2].m/(Par[i1].m+Par[i2].m);
         real  nu1 = 0.5*Par[i1].Kn/Par[i1].Kt - 1.0;
