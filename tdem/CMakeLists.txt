@@ -40,6 +40,7 @@ SET(CUDAPROGS
     test_cu_02
     test_cu_03
     test_cu_04
+    shake
 )
 
 FOREACH(var ${EXES})

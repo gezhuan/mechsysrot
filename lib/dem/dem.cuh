@@ -118,7 +118,7 @@ __global__ void CalcForceVV(InteractonCU * Int, ComInteractonCU * CInt, DynInter
         real3 zp1,zp2;
         Rotation(zu,DPar[i1].Q,zp1);
         Rotation(zu,DPar[i2].Q,zp2); 
-        real  a1  = acos(dotreal3(zp1,-1.0*n)); // ai wil121l be the angle with the z vector of particle i
+        real  a1  = acos(dotreal3(zp1,-1.0*n)); // ai will be the angle with the z vector of particle i
         real  a2  = acos(dotreal3(zp2,     n));
         real  fac = 1.0e-6;                 // fac is the reduction factor for the stiffness
         real  K1  = Par[i1].Kn*(fac + (1.0 - fac)*0.5*(1.0-tanh((a1-1.5708)/0.001))); //The stiffness is related to the angle between the normal
@@ -137,6 +137,7 @@ __global__ void CalcForceVV(InteractonCU * Int, ComInteractonCU * CInt, DynInter
         real  Gn  = 2.0*sqrt(5.0/6.0)*b*sqrt(me*2.0*Ye*sqrt(Re));
         real  Gt  = 2.0*sqrt(5.0/6.0)*b*sqrt(me*8.0*Ge*sqrt(Re));
         real  sqrtdelta = sqrt(delta);
+        //if (i1==2) printf("K1 %g K2 %g Kn %g Gn %g Gt %g a1 %g a2 %g dotzpqn %g \n",K1,K2,Kn,Gn,Gt,a1,a2,dotreal3(zp2,n));
 
         DIntVV[ic].Fn  = Kn*sqrtdelta*delta*n;
         DIntVV[ic].Ft  = DIntVV[ic].Ft + (Kt*sqrtdelta*demaux[0].dt)*vt;
